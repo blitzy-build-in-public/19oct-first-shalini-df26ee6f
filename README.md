@@ -59,7 +59,7 @@ Once the port is bound, the server prints one line and then keeps running in the
 Server listening on port 3000
 ```
 
-Nothing is printed before the port is bound, so that line means the server is ready to accept
+The server prints nothing before the port is bound, so that line means the server is ready to accept
 requests. The one difference between the two commands is that `npm start` prints a short banner of
 its own first; the server's own line is the one reading `Server listening on port 3000`.
 
