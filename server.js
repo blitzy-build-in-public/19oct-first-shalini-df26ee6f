@@ -56,7 +56,7 @@ function logRequest(method, path) {
   console.log(`[${new Date().toISOString()}] [${method}] [${path}]`);
 }
 
-// The only place a status and Content-Type are set; the body ends in one call.
+// Set the status and Content-Type in one place, then end the body in one call.
 function sendTextResponse(res, statusCode, body) {
   res.statusCode = statusCode;
   res.setHeader('Content-Type', 'text/plain');
@@ -99,8 +99,8 @@ function handleUnexpectedError(err, res) {
 
   console.error(`Request error for ${requestTarget}: ${message}`);
 
-  // Headers already sent mean the response is half written: end it instead of
-  // writing a second one.
+  // Headers already sent mean the response is half written: destroy it instead
+  // of writing a second one.
   if (res.headersSent) {
     res.destroy();
     return;
@@ -109,7 +109,7 @@ function handleUnexpectedError(err, res) {
   sendTextResponse(res, 500, 'Internal Server Error');
 }
 
-// The request pipeline: mark the socket busy, derive the path, log, then route.
+// Count the socket's in-flight requests, derive the path, log, then route.
 function handleRequest(req, res) {
   try {
     // A socket's in-flight requests are counted, because a pipelined response
@@ -151,8 +151,8 @@ function startServer(server, port) {
     console.log(`Server listening on port ${port}`);
   });
 
-  // A fatal startup failure prints one plain line on standard error and ends
-  // the process non-zero.
+  // A fatal startup failure gets one plain line on standard error, never
+  // err.stack, and a non-zero exit status.
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       // The suggested port stays inside the accepted range even at the top.
